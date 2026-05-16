@@ -16,7 +16,10 @@ from typing import Any
 import pytest
 import yaml
 
+import argparse
+
 from agent_os.cli.cmd_atr_import import (
+    cmd_atr_import,
     compile_per_category,
     watch_and_recompile,
 )
@@ -266,3 +269,62 @@ class TestManifest:
             "prompt-injection",
             "tool-poisoning",
         }
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point — argument validation
+# ---------------------------------------------------------------------------
+
+
+def _build_cli_args(
+    atr_dir: Path,
+    out_dir: Path,
+    *,
+    watch: bool = False,
+    manifest: Path | None = None,
+) -> argparse.Namespace:
+    """Build a Namespace matching what argparse produces for ``cmd_atr_import``."""
+    return argparse.Namespace(
+        atr_dir=atr_dir,
+        out=out_dir,
+        category=None,
+        min_severity=None,
+        id_prefix=None,
+        strict_regex=False,
+        manifest=manifest,
+        watch=watch,
+        watch_interval=2.0,
+    )
+
+
+class TestCmdAtrImportValidation:
+    """CLI entry-point path validation (boundary checks before compile)."""
+
+    def test_cli_returns_1_on_nonexistent_atr_dir(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        args = _build_cli_args(tmp_path / "does-not-exist", tmp_path / "out")
+        exit_code = cmd_atr_import(args)
+        captured = capsys.readouterr()
+        assert exit_code == 1
+        assert "ATR rules directory does not exist" in captured.err
+
+    def test_cli_returns_1_on_atr_dir_that_is_a_file(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        file_path = tmp_path / "rules.yaml"
+        file_path.write_text("not a directory", encoding="utf-8")
+        args = _build_cli_args(file_path, tmp_path / "out")
+        exit_code = cmd_atr_import(args)
+        captured = capsys.readouterr()
+        assert exit_code == 1
+        assert "is not a directory" in captured.err
+
+    def test_cli_succeeds_with_valid_paths(self, tmp_path: Path) -> None:
+        src = tmp_path / "atr"
+        out = tmp_path / "out"
+        _write_atr_tree(src)
+        args = _build_cli_args(src, out)
+        assert cmd_atr_import(args) == 0
+        assert (out / "prompt-injection.yaml").exists()
+        assert (out / "tool-poisoning.yaml").exists()

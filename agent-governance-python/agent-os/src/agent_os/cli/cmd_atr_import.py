@@ -360,8 +360,37 @@ def register_atr_import_subcommand(subparsers: argparse._SubParsersAction) -> No
     )
 
 
+def _validate_cli_paths(
+    atr_dir: Path, out_dir: Path
+) -> str | None:
+    """Pre-flight validation for CLI path arguments.
+
+    Returns ``None`` on success, or a single-line error message that the
+    caller should print to stderr before returning a non-zero exit code.
+
+    Validates:
+      * ``atr_dir`` exists as a directory (fail fast before doing any work).
+      * ``out_dir.parent`` is creatable / writable (fail before the first
+        rule is parsed, instead of mid-compile after manifest generation).
+    """
+    if not atr_dir.exists():
+        return f"ATR rules directory does not exist: {atr_dir}"
+    if not atr_dir.is_dir():
+        return f"ATR rules path is not a directory: {atr_dir}"
+    try:
+        out_dir.parent.mkdir(parents=True, exist_ok=True)
+    except (OSError, PermissionError) as exc:
+        return f"Output directory parent is not writable: {out_dir.parent} ({exc})"
+    return None
+
+
 def cmd_atr_import(args: argparse.Namespace) -> int:
     """Entry point for ``agentos atr-import``."""
+    validation_error = _validate_cli_paths(args.atr_dir, args.out)
+    if validation_error is not None:
+        print(f"ERROR: {validation_error}", file=sys.stderr)
+        return 1
+
     categories: set[str] | None = (
         set(args.category) if getattr(args, "category", None) else None
     )
