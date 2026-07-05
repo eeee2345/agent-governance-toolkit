@@ -66,7 +66,7 @@ REGISTERED_PACKAGES = {
     # Common dependencies
     "pydantic", "pyyaml", "cryptography", "pynacl", "httpx", "aiohttp",
     "fastapi", "uvicorn", "requests", "packaging", "structlog", "click", "rich", "numpy", "scipy",
-    "pytest", "pytest-asyncio", "pytest-cov", "ruff", "mypy", "build",
+    "pytest", "pytest-asyncio", "pytest-cov", "ruff", "mypy", "build", "tzdata",
     "openai", "openai-agents", "anthropic", "langchain", "langchain-core", "crewai",
     "croniter",
     "redis", "sqlalchemy", "asyncpg", "chromadb", "pinecone-client",

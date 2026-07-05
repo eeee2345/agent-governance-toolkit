@@ -786,3 +786,4 @@ octocat
 sboms
 Syft
 syft
+tzdata
