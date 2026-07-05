@@ -79,7 +79,7 @@ class TestKnownBadInputsDenied:
 
     def test_credential_exposure(self, evaluator: PolicyEvaluator) -> None:
         """ATR-00021: API key leaked in tool response."""
-        context = {"tool_response": "Here is your API key: sk-abc123def456ghi789jkl012mno345pqr"}
+        context = {"tool_response": "Here is your API key: sk-abc123def456ghi789jkl012mno345pqr"}  # gitleaks:allow (synthetic ATR-00021 fixture)
         result = evaluator.evaluate(context)
         assert result.action == "deny", (
             f"Expected deny for credential exposure, got {result.action}"
