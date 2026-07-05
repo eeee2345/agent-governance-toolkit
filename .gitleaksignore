@@ -81,3 +81,5 @@ f80fd4b5e3184f6f37a59aebeb824f5f5095dff7:examples/quickstart/autogen_governed.py
 39246f55f7b0e1f81bbe81a05b41f7b0dde4af67:packages/agent-os/tests/test_security_skills.py:generic-api-key:270
 cd2e349a685070d4e58f8d2867b04070151db5cb:packages/agent-os/tests/test_cli_extended_coverage.py:generic-api-key:102
 cd2e349a685070d4e58f8d2867b04070151db5cb:packages/agent-os/tests/test_cli_extended_coverage.py:github-pat:131
+# ATR-00021 credential-exposure test payload in the community-rules example (synthetic):
+d091683176656f8e3c819ebf3e789706f63beda6:examples/atr-community-rules/test_atr_policy.py:generic-api-key:79
